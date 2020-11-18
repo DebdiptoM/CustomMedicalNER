@@ -1,5 +1,28 @@
 # Setting up the pipeline and entity recognizer.
 import spacy
+import random
+TRAIN_DATA = [('what is the price of polo?', {'entities': [(21, 25, 'PrdName')]}), 
+              ('what is the price of ball?', {'entities': [(21, 25, 'PrdName')]}), 
+              ('what is the price of jegging?', {'entities': [(21, 28, 'PrdName')]}), 
+              ('what is the price of t-shirt?', {'entities': [(21, 28, 'PrdName')]}), 
+              ('what is the price of jeans?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of bat?', {'entities': [(21, 24, 'PrdName')]}), 
+              ('what is the price of shirt?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of bag?', {'entities': [(21, 24, 'PrdName')]}), 
+              ('what is the price of cup?', {'entities': [(21, 24, 'PrdName')]}), 
+              ('what is the price of jug?', {'entities': [(21, 24, 'PrdName')]}), 
+              ('what is the price of plate?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of glass?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of moniter?', {'entities': [(21, 28, 'PrdName')]}), 
+              ('what is the price of desktop?', {'entities': [(21, 28, 'PrdName')]}), 
+              ('what is the price of bottle?', {'entities': [(21, 27, 'PrdName')]}), 
+              ('what is the price of mouse?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of keyboad?', {'entities': [(21, 28, 'PrdName')]}), 
+              ('what is the price of chair?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of table?', {'entities': [(21, 26, 'PrdName')]}), 
+              ('what is the price of watch?', {'entities': [(21, 26, 'PrdName')]})]
+
+
 nlp = spacy.blank('en')  # create blank Language class
 print("Created blank 'en' model")
 if 'ner' not in nlp.pipe_names:
@@ -9,7 +32,7 @@ else:
     ner = nlp.get_pipe('ner')
 
 # Add new entity labels to entity recognizer
-LABEL=['B-geo','I-org','B-gpe']
+LABEL=['PrdName']
 for i in LABEL:
     ner.add_label(i)
 # Inititalizing optimizer
@@ -19,6 +42,7 @@ if model  is None:
 else:
     optimizer = nlp.entity.create_optimizer()
 
+n_iter=100
 other_pipes = [pipe for pipe in nlp.pipe_names if pipe != 'ner']
 with nlp.disable_pipes(*other_pipes):  # only train NER
     for itn in range(n_iter):
@@ -31,10 +55,10 @@ with nlp.disable_pipes(*other_pipes):  # only train NER
             # Updating the weights
             nlp.update(texts, annotations, sgd=optimizer, 
                        drop=0.35, losses=losses)
-        print('Losses', losses)
+            print('Losses', losses)
             nlp.update(texts, annotations, sgd=optimizer, 
                        drop=0.35, losses=losses)
-        print('Losses', losses)
+            print('Losses', losses)
 
 # Save model 
 if output_dir is not None:
